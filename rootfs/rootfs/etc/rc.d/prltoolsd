@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SYSTYPE=$(cat /sys/class/dmi/id/sys_vendor | grep -ic parallels)
+
+if [ "$SYSTYPE" -gt 0 ]; then
+	# Creates mountpoint for Shared Folders
+	if [ ! -d /mnt/psf ]; then
+		mkdir -p /mnt/psf
+		# load shared folders and tools gate kernel module
+		modprobe prl_tg prl_fs
+		mount -t prl_fs Home /mnt/psf
+	fi
+
+	/usr/local/bin/prltoolsd -p /var/run/prltoolsd.pid
+fi

@@ -208,6 +208,13 @@ RUN mkdir -p /vmtoolsd/${LIBDNET} &&\
     make &&\
     make install && make DESTDIR=$ROOTFS install
 
+# Build Parallels Tools kernel modules
+COPY kmods/ /prl-kmods/
+
+RUN KERNEL_DIR=/linux-kernel/ KVER=$KERNEL_VERSION SRC=/linux-kernel/ \
+  make -C /prl-kmods -f Makefile.kmods && \
+  find /prl-kmods -name \*.ko -exec cp {} $ROOTFS/lib/modules/$KERNEL_VERSION-boot2docker/ \;
+
 # Horrible hack again
 RUN cd $ROOTFS && cd usr/local/lib && ln -s libdnet.1 libdumbnet.so.1 &&\
     cd $ROOTFS && ln -s lib lib64
